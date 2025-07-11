@@ -1,0 +1,6 @@
+192.168.1.100 - - [26/Jun/2025:12:01:15 +0000] "GET /uploads/clsupload.asp HTTP/1.1" 200 4523 "http://example.com/upload" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+203.0.113.45 - - [26/Jun/2025:12:02:42 +0000] "POST /shell.php HTTP/1.1" 403 123 "-" "curl/7.68.0"
+198.51.100.23 - - [26/Jun/2025:12:05:10 +0000] "GET /images/logo.png HTTP/1.1" 200 2456 "http://example.com" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"
+192.168.1.100 - - [26/Jun/2025:12:07:33 +0000] "GET /uploads/clsupload.asp?cmd=whoami HTTP/1.1" 200 512 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+198.51.100.23 - - [26/Jun/2025:12:10:00 +0000] "POST /api/execute.php HTTP/1.1" 500 1024 "-" "Python-urllib/3.9"
+198.51.100.23 - - [26/Jun/2025:12:10:00 +0000] "POST /api/wp-admin HTTP/1.1" 500 1024 "-" "Python-urllib/3.9"
