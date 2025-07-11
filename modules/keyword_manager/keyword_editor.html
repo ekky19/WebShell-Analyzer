@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IOC Tag Editor</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background: #f4f6f9;
+      color: #333;
+    }
+
+    h2, h3, h4 {
+      color: #2c3e50;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    select, input[type="text"], input[type="number"], button {
+      margin: 5px;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      width: 250px;
+    }
+
+    button {
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #ecf0f1;
+      border-radius: 4px;
+      padding: 4px 10px;
+      margin: 4px 4px 4px 0;
+      position: relative;
+    }
+
+    .remove {
+      margin-left: 8px;
+      color: red;
+      cursor: pointer;
+    }
+
+    .category-block {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .config-btn {
+      padding: 8px 14px;
+      margin: 5px 10px 5px 0;
+      background-color: #ecf0f1;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      color: black;
+    }
+
+    .config-btn:hover {
+      background-color: #d0d3d4;
+    }
+
+    #top-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .category-block input[type="text"] {
+      width: 200px;
+    }
+
+    #category-section input {
+      margin-top: 8px;
+    }
+
+    .corner-delete {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      color: red;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .corner-delete:hover {
+      transform: scale(1.2);
+    }
+
+    /* Fancy modal */
+    #confirm-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      z-index: 999;
+    }
+
+    #confirm-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      z-index: 1000;
+      text-align: center;
+      display: none;
+    }
+
+    #confirm-modal h3 {
+      margin-top: 0;
+    }
+
+    #confirm-modal button {
+      margin: 10px 10px 0 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #confirm-modal .yes-btn {
+      background: #e74c3c;
+      color: white;
+    }
+
+    #confirm-modal .no-btn {
+      background: #bdc3c7;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <h2>✨ IOC Tag Editor</h2>
+
+  <div style="text-align: center;">
+    <label for="server-select">Select Server Type:</label>
+    <select id="server-select"></select>
+    <input type="text" id="filter-input" placeholder="Search category or keyword..." oninput="renderCategories()" />
+  </div>
+
+  <div id="top-section">
+    <div class="category-block" id="mft-wrapper">
+      <h4>🔧 MFT Settings</h4>
+      <div id="mft-section"></div>
+    </div>
+
+    <div class="category-block">
+      <h3>➕ Add New Category</h3>
+      <input type="text" id="new-cat-name" placeholder="Category ID (e.g. XSS_KEYWORDS)" />
+      <input type="text" id="new-cat-desc" placeholder="Description" />
+      <input type="text" id="new-cat-kw" placeholder="First keyword (optional)" />
+      <button onclick="addCategory()">Add Category</button>
+    </div>
+
+    <div class="category-block">
+      <h3>💾 Config Management</h3>
+      <button onclick="exportConfig()" class="config-btn">📅 Download JSON</button>
+      <label for="import-file" class="config-btn" style="cursor: pointer;">📄 Import JSON</label>
+      <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importConfig(event)">
+    </div>
+  </div>
+
+  <div id="category-section"></div>
+
+  <!-- Modal -->
+  <div id="confirm-overlay"></div>
+  <div id="confirm-modal">
+    <h3 id="confirm-message">Are you sure?</h3>
+    <button class="yes-btn">Yes</button>
+    <button class="no-btn">Cancel</button>
+  </div>
+
+  <script>
+    let config = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/api/config')
+        .then(res => res.json())
+        .then(data => {
+          config = data;
+          populateServerDropdown();
+          renderCategories();
+        });
+
+      document.getElementById('server-select').addEventListener('change', renderCategories);
+    });
+
+    function populateServerDropdown() {
+      const select = document.getElementById('server-select');
+      select.innerHTML = '';
+      for (const type in config) {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type.toUpperCase();
+        select.appendChild(opt);
+      }
+    }
+
+    function renderCategories() {
+      const server = document.getElementById('server-select').value;
+      const section = document.getElementById('category-section');
+      const filter = document.getElementById('filter-input').value.toLowerCase();
+      section.innerHTML = '';
+
+
+
+      const categories = config[server];
+      Object.entries(categories).forEach(([catName, data]) => {
+        if (catName === "mft_settings") return;
+
+        const delBtn = document.createElement('span');
+        delBtn.innerHTML = '❌';
+        delBtn.className = 'corner-delete';
+        delBtn.onclick = () => {
+          showConfirmModal(`Delete category '${catName}' from ${server}?`, () => {
+            fetch('/api/delete_category', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ server, category: catName })
+            }).then(() => {
+              delete config[server][catName];
+              renderCategories();
+            });
+          });
+        };
+
+        const kwMatch = data.keywords.some(kw => kw.toLowerCase().includes(filter));
+        if (!catName.toLowerCase().includes(filter) && !kwMatch) return;
+
+        const block = document.createElement('div');
+        block.className = 'category-block';
+
+        const titleWrapper = document.createElement('div');
+        titleWrapper.style.position = 'relative';
+
+        const title = document.createElement('h4');
+        title.innerHTML = `<div>${catName}</div><div style="font-weight: normal; font-size: 0.9em;">(${data.description})</div>`;
+        titleWrapper.appendChild(title);
+        titleWrapper.appendChild(delBtn);
+
+        const tagList = document.createElement('div');
+        data.keywords.forEach((kw, idx) => {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.innerHTML = `${kw}<span class="remove" onclick="removeKeyword('${server}', '${catName}', ${idx})">x</span>`;
+          tagList.appendChild(tag);
+        });
+
+        const input = document.createElement('input');
+        input.placeholder = 'Add keyword regex';
+        const btn = document.createElement('button');
+        btn.textContent = 'Add';
+        btn.onclick = () => {
+          try {
+            if (!input.value) return;
+            new RegExp(input.value);
+            config[server][catName].keywords.push(input.value);
+            autoSave();
+            renderCategories();
+          } catch {
+            showAlertModal('Invalid regex');
+          }
+        };
+
+        block.appendChild(titleWrapper);
+        block.appendChild(tagList);
+        block.appendChild(input);
+        block.appendChild(btn);
+        section.appendChild(block);
+      });
+
+      const mft = config[server].mft_settings;
+      if (mft) renderMftSettings(document.getElementById('mft-section'), server, mft);
+    }
+
+    function renderMftSettings(container, server, settings) {
+      container.innerHTML = '';
+
+      const extTitle = document.createElement('strong');
+      extTitle.textContent = 'Web Extensions:';
+      container.appendChild(extTitle);
+
+      const extContainer = document.createElement('div');
+      settings.web_extensions.forEach((ext, idx) => {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.innerHTML = ext + '<span class="remove" onclick="removeExtension(\'' + server + '\',' + idx + ')">x</span>';
+        extContainer.appendChild(tag);
+      });
+
+      const extInput = document.createElement('input');
+      extInput.placeholder = "Add extension (e.g. .jsp)";
+      const extBtn = document.createElement('button');
+      extBtn.textContent = 'Add';
+      extBtn.onclick = () => {
+        if (extInput.value && !settings.web_extensions.includes(extInput.value)) {
+          settings.web_extensions.push(extInput.value);
+          autoSave();
+          renderCategories();
+        }
+      };
+
+      container.appendChild(extContainer);
+      container.appendChild(extInput);
+      container.appendChild(extBtn);
+
+      const timeLabel = document.createElement('div');
+      timeLabel.innerHTML = "<br><strong>Time Window (seconds):</strong>";
+      container.appendChild(timeLabel);
+
+      const timeInput = document.createElement('input');
+      timeInput.type = "number";
+      timeInput.value = settings.time_window_seconds;
+      timeInput.onchange = () => {
+        settings.time_window_seconds = parseInt(timeInput.value);
+        autoSave();
+      };
+      container.appendChild(timeInput);
+    }
+
+    function removeKeyword(server, category, index) {
+      config[server][category].keywords.splice(index, 1);
+      autoSave();
+      renderCategories();
+    }
+
+    function removeExtension(server, index) {
+      config[server].mft_settings.web_extensions.splice(index, 1);
+      autoSave();
+      renderCategories();
+    }
+
+    function addCategory() {
+      const server = document.getElementById('server-select').value;
+      const id = document.getElementById('new-cat-name').value.trim();
+      const desc = document.getElementById('new-cat-desc').value.trim();
+      const kw = document.getElementById('new-cat-kw').value.trim();
+      if (!id || !desc) return showAlertModal('Category ID and description are required.');
+
+      if (!config[server][id]) {
+        config[server][id] = { description: desc, keywords: kw ? [kw] : [] };
+        autoSave();
+        renderCategories();
+      } else {
+        showAlertModal('Category already exists.');
+      }
+
+      document.getElementById('new-cat-name').value = '';
+      document.getElementById('new-cat-desc').value = '';
+      document.getElementById('new-cat-kw').value = '';
+    }
+
+    function autoSave() {
+      fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      });
+    }
+
+    function exportConfig() {
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'keyword_config.json';
+      link.click();
+    }
+
+    function importConfig(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          showConfirmModal("⚠️ This will overwrite your current config. Continue?", () => {
+            config = imported;
+            autoSave();
+            populateServerDropdown();
+            renderCategories();
+          });
+        } catch {
+          showAlertModal("❌ Invalid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showConfirmModal(message, onConfirm) {
+      const overlay = document.getElementById('confirm-overlay');
+      const modal = document.getElementById('confirm-modal');
+      const msgBox = document.getElementById('confirm-message');
+      const yesBtn = modal.querySelector('.yes-btn');
+      const noBtn = modal.querySelector('.no-btn');
+
+      msgBox.textContent = message;
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+
+      yesBtn.style.display = 'inline-block';
+      noBtn.textContent = 'Cancel';
+
+      yesBtn.onclick = () => {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+        onConfirm();
+      };
+
+      noBtn.onclick = () => {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+      };
+    }
+
+    function showAlertModal(message) {
+      const overlay = document.getElementById('confirm-overlay');
+      const modal = document.getElementById('confirm-modal');
+      const msgBox = document.getElementById('confirm-message');
+      const yesBtn = modal.querySelector('.yes-btn');
+      const noBtn = modal.querySelector('.no-btn');
+
+      msgBox.textContent = message;
+      overlay.style.display = 'block';
+      modal.style.display = 'block';
+
+      yesBtn.style.display = 'none';
+      noBtn.textContent = 'OK';
+      noBtn.onclick = () => {
+        modal.style.display = 'none';
+        overlay.style.display = 'none';
+        yesBtn.style.display = 'inline-block';
+        noBtn.textContent = 'Cancel';
+      };
+    }
+  </script>
+</body>
+</html>

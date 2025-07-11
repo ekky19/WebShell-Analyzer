@@ -1,0 +1,404 @@
+{
+  "apache": {
+    "CMS_ATTACK_PATTERNS": {
+      "description": "CMS-specific attack vectors for WordPress, Joomla, Drupal",
+      "keywords": [
+        "wp-login.php",
+        "xmlrpc.php",
+        "administrator/index.php",
+        "Drupal.settings"
+      ]
+    },
+    "DANGEROUS_HTACCESS": {
+      "description": ".htaccess manipulations for code execution or directory traversal",
+      "keywords": [
+        "AddHandler",
+        "AddType",
+        "php_value",
+        "RewriteRule",
+        "Options +Indexes"
+      ]
+    },
+    "MALICIOUS_EXTENSIONS": {
+      "description": "test",
+      "keywords": [
+        ".php"
+      ]
+    },
+    "UPLOAD_EXPLOITS": {
+      "description": "Commonly exploited upload mechanisms",
+      "keywords": [
+        "upload.php",
+        "uploadify",
+        "ajaxupload",
+        "async-upload",
+        "shell.php"
+      ]
+    },
+    "mft_settings": {
+      "time_window_seconds": 500,
+      "web_extensions": [
+        ".php",
+        ".asp",
+        ".aspx",
+        ".jsp"
+      ]
+    }
+  },
+  "iis": {
+    "DANGEROUS_KEYWORDS": {
+      "description": "Broad set of malicious indicators (webshells, C2, malware, etc.)",
+      "keywords": [
+        "\\bcmd\\b",
+        "cmd\\s+/c",
+        "\\bcmd\\.exe\\b",
+        "xp_cmdshell",
+        "SaveToFile",
+        "\\bpowershell\\b",
+        "powershell\\.exe",
+        "eval\\(",
+        "system\\(",
+        "\\bexec\\b",
+        "\\becho\\b",
+        "\\bwget\\b",
+        "\\bcurl\\b",
+        "downloadfile",
+        "new-object",
+        "writeallbytes",
+        "shell\\.jsp",
+        "tmsCmd\\.jsp",
+        "r57\\.php",
+        "c99\\.php",
+        "generic\\.jsp",
+        "webclient",
+        "Runtime\\.getRuntime",
+        "ProcessStartInfo",
+        "set_UseShellExecute",
+        "ExecuteEngine",
+        "['\\\"]?whoami['\\\"]?",
+        "\\bhostname\\b",
+        "\\bsysteminfo\\b",
+        "net user",
+        "\\bipconfig\\b",
+        "\\btasklist\\b",
+        "\\bdir\\b",
+        "\\bpwd\\b",
+        "\\bping\\b",
+        "\\bnslookup\\b",
+        "\\barp\\b",
+        "\\bgpresult\\b",
+        "\\bnetstat\\b",
+        "\\bnltest\\b",
+        "\\bqwinsta\\b",
+        "\\bwmic\\b",
+        "uname\\s+-a",
+        "ls\\s+-la",
+        "find\\s+\\.\\s+-type\\s+f",
+        "ps\\s+-aux",
+        "netstat\\s+-an",
+        "base64",
+        "char\\(",
+        "chr\\(",
+        "frombase64string",
+        "getstring",
+        "viewstate",
+        "strrev\\(",
+        "gzdecode\\(",
+        "gzinflate\\(",
+        "gzuncompress\\(",
+        "base64_decode",
+        "str_rot13\\(",
+        "urldecode\\(",
+        "php://",
+        "ob_start\\(",
+        "\\$_",
+        "\\$_POST",
+        "\\$_GET",
+        "\\$_REQUEST",
+        "\\$_COOKIE",
+        "\\$_FILES",
+        "@eval",
+        "\\$GLOBALS",
+        "scripting\\.filesystemobject",
+        "AddType\\s+application/x-httpd-",
+        "php_value\\s+auto_prepend_file",
+        "AddHandler",
+        "AddOutputFilter",
+        "register_globals",
+        "ScRiPtInG",
+        "preg_replace",
+        "preg_replace\\s*\\(\\s*['\\\"]/e['\\\"]",
+        "add-pssnapin",
+        "ecp/auth",
+        "register\\.aspx",
+        "roleassignment",
+        "managementrole",
+        "add-mailboxpermission",
+        "get-mailboxpermission",
+        "union select",
+        "sp_configure",
+        "\\.\\./",
+        "login\\.jsp",
+        "plugin-install",
+        "file-manager",
+        "file not found",
+        "404 not found",
+        "LOAD DATA LOCAL INFILE",
+        "theme-editor\\.php",
+        "/etc/passwd",
+        "/etc/shadow",
+        "/etc/syslog\\.conf",
+        "/proc/cpuinfo",
+        "/windows/system32/",
+        "/etc/proftpd\\.conf",
+        "/etc/resolv\\.conf",
+        "/var/log/lastlog",
+        "\\.bash_history",
+        "\\.mysql_history",
+        "\\.ssh/authorized_keys",
+        "\\bUSER\\b",
+        "\\bPASS\\b",
+        "\\bPRIVMSG\\b",
+        "\\bMODE\\b",
+        "\\bPING\\b",
+        "\\bPONG\\b",
+        "\\bJOIN\\b",
+        "\\bPART\\b",
+        "b374k",
+        "\\bbackdoor\\b",
+        "\\bmeterpreter\\b",
+        "cobalt strike",
+        "\\bpayload\\b",
+        "sunburst",
+        "teardrop",
+        "Wireghoul",
+        "visbot",
+        "evilc0ders",
+        "kingdefacer",
+        "\\bexploit\\b",
+        "\\bdeface\\b",
+        "\\brootkit\\b",
+        "\\bwarez\\b",
+        "hashcrack",
+        "id_rsa",
+        "libpcprofile",
+        "LD_PRELOAD",
+        "snapin",
+        "workspace",
+        "tmui",
+        "groupeditempicker\\.aspx",
+        "edoced_46esab",
+        "etalfnizg",
+        "ecalper_gerp",
+        "slabolg",
+        "base64_decode\\(",
+        "phpInImage",
+        "DynamicRun",
+        "get_IsReusable",
+        "ProcessRequest",
+        "clazz",
+        "codes",
+        "args",
+        "logoimagehandler\\.ashx",
+        "SitelogoImage",
+        "\\bshell\\b",
+        "sh3ll",
+        "cmd shell",
+        "\\breverse\\b",
+        "backconnect",
+        "trojan",
+        "payload",
+        "exploit",
+        "hack",
+        "hacked",
+        "defacer",
+        "reverse shell",
+        "cmd shell",
+        "meterpreter",
+        "nc\\s+-l",
+        "\\.pfx",
+        "WScript\\.Shell",
+        "WinExec",
+        "kernel32\\.dll"
+      ]
+    },
+    "ENCODING_INDICATORS": {
+      "description": "Indicators of encoded or obfuscated payloads (Base64, hex)",
+      "keywords": [
+        "[A-Za-z0-9+/]{100,}={0,2}",
+        "(\\\\x[0-9a-fA-F]{2}){10,}"
+      ]
+    },
+    "MALICIOUS_EXTENSIONS": {
+      "description": "Extensions that don't typically belong on IIS servers",
+      "keywords": [
+        ".jsp",
+        ".php"
+      ]
+    },
+    "SUSPICIOUS_PATHS": {
+      "description": "Typical suspicious or backdoor file paths",
+      "keywords": [
+        "cmd.aspx",
+        "shell.aspx",
+        "1.asp",
+        "backdoor.php"
+      ]
+    },
+    "VULNERABLE_PAGES": {
+      "description": "Commonly attacked endpoints",
+      "keywords": [
+        "upload",
+        "admin",
+        "config"
+      ]
+    },
+    "mft_settings": {
+      "time_window_seconds": 240,
+      "web_extensions": [
+        ".php",
+        ".asp",
+        ".aspx",
+        ".jsp"
+      ]
+    }
+  },
+  "nginx": {
+    "DANGEROUS_KEYWORDS": {
+      "description": "Broad set of malicious indicators (webshells, exploits, encoded payloads, scanning activity)",
+      "keywords": [
+        "cmd.exe",
+        "cmd /c",
+        "powershell",
+        "eval(",
+        "system(",
+        "exec(",
+        "shell_exec",
+        "passthru",
+        "base64_decode",
+        "curl",
+        "wget",
+        "whoami",
+        "ipconfig",
+        "netstat",
+        "tasklist",
+        "nc -l",
+        "reverse shell",
+        "backdoor",
+        "r57.php",
+        "c99.php",
+        "phpinfo()",
+        "php://input",
+        "proc/self/environ",
+        "union select",
+        "load_file",
+        "sleep(",
+        "sleep ",
+        "request.getparameter",
+        "jsp",
+        "asp",
+        "aspx",
+        "php",
+        "phtml",
+        "perl",
+        "python",
+        "bash",
+        "sh",
+        "eval base64",
+        "exec base64",
+        "base64,",
+        "cmd /k",
+        "\\.\\.\\/",
+        "etc/passwd",
+        "/bin/bash",
+        "systeminfo",
+        "wget ",
+        "curl ",
+        "powershell.exe",
+        "GetObject(",
+        "CreateObject(",
+        "ADODB.Stream",
+        "shell.",
+        "readfile(",
+        "file_put_contents",
+        "chmod(",
+        "chown(",
+        "fwrite(",
+        "curl_exec",
+        "system('",
+        "system \"",
+        "powershell -nop",
+        "powershell -enc",
+        "Invoke-Expression",
+        "IEX",
+        "Invoke-WebRequest",
+        "Invoke-RestMethod",
+        "nc.exe",
+        "netcat",
+        "telnet",
+        "mshta",
+        "regsvr32",
+        "bitsadmin",
+        "schtasks",
+        "wmic",
+        "msbuild",
+        "cscript",
+        "wscript"
+      ]
+    },
+    "DEFAULT_ADMIN_PAGES": {
+      "description": "Common CMS admin panels that may be targeted",
+      "keywords": [
+        "wp-admin",
+        "phpmyadmin",
+        "admin.php"
+      ]
+    },
+    "ENCODING_INDICATORS": {
+      "description": "Indicators of encoded or obfuscated payloads (Base64, hex) in Nginx logs",
+      "keywords": [
+        "[A-Za-z0-9+/]{100,}={0,2}",
+        "(\\\\x[0-9a-fA-F]{2}){10,}"
+      ]
+    },
+    "MALICIOUS_EXTENSIONS": {
+      "description": "File extensions that are commonly abused for malicious uploads",
+      "keywords": [
+        ".php",
+        ".phtml",
+        ".pl",
+        ".cgi"
+      ]
+    },
+    "SUSPICIOUS_PATHS": {
+      "description": "Suspicious or backdoor-like paths",
+      "keywords": [
+        "cmd.php",
+        "shell.php",
+        "backdoor.php",
+        "adminer.php",
+        "config.php"
+      ]
+    },
+    "SUSPICIOUS_UPLOADS": {
+      "description": "Common suspicious or backdoor upload filenames",
+      "keywords": [
+        "upload.php",
+        "shell.php",
+        "uploadify",
+        "async-upload",
+        "ajaxupload"
+      ]
+    },
+    "mft_settings": {
+      "time_window_seconds": 200,
+      "web_extensions": [
+        ".php",
+        ".phtml",
+        ".pl",
+        ".cgi",
+        "asp"
+      ]
+    }
+  }
+}

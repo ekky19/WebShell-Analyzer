@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Output Log Report</title>
+<style>
+  /* Reset & base */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background: #121212;
+    color: #e0e0e0;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #00bcd4;
+    letter-spacing: 1.2px;
+  }
+  #controls {
+    max-width: 900px;
+    margin: 0 auto 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+  }
+  #filterPanel {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  #filterPanel label {
+    user-select: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: #222;
+    transition: background 0.3s ease;
+  }
+  #filterPanel label:hover {
+    background: #333;
+  }
+  #filterPanel input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #00bcd4;
+    cursor: pointer;
+  }
+  #toggleFiltersBtn {
+    background: #00bcd4;
+    border: none;
+    padding: 8px 20px;
+    font-weight: 700;
+    border-radius: 25px;
+    cursor: pointer;
+    color: #121212;
+    transition: background 0.3s ease;
+  }
+  #toggleFiltersBtn:hover {
+    background: #0097a7;
+  }
+  #searchBox {
+    flex-grow: 1;
+    min-width: 220px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    font-size: 14px;
+  }
+
+  /* Log container */
+ #logContainer {
+	  max-width: 90vw;
+	  margin: 0 auto;
+	  background: #1e1e1e;
+	  border-radius: 8px;
+	  box-shadow: 0 0 20px #00bcd4a0;
+	  padding: 20px;
+	  height: 80vh;
+	  overflow-y: auto;
+	  font-family: 'Courier New', Courier, monospace;
+	  font-size: 14px;
+	  line-height: 1.5;
+	  white-space: pre-wrap;
+	  position: relative;
+	}
+
+  #noLogsMessage {
+    text-align: center;
+    margin-top: 40px;
+    font-style: italic;
+    color: #888;
+    display: none;
+  }
+
+  /* Log lines */
+  .log-line {
+    padding: 5px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    transition: background 0.3s ease;
+    cursor: context-menu;
+    outline-offset: 2px;
+  }
+  .log-line:hover,
+  .log-line:focus {
+    background: #333;
+    outline: 2px solid #00bcd4;
+  }
+  .ERROR {
+    color: #f44336;
+    font-weight: 700;
+  }
+  .WARNING {
+    color: #ff9800;
+    font-weight: 600;
+  }
+  .INFO {
+    color: #4caf50;
+  }
+  .DEBUG {
+    color: #9e9e9e;
+    font-style: italic;
+  }
+
+  /* Context menu */
+  #contextMenu {
+    position: absolute;
+    display: none;
+    background: #222;
+    box-shadow: 0 0 8px #00bcd4aa;
+    border-radius: 6px;
+    z-index: 9999;
+    width: 180px;
+    user-select: none;
+  }
+  #contextMenu ul {
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+  }
+  #contextMenu ul li {
+    padding: 10px 20px;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  #contextMenu ul li:hover {
+    background: #00bcd4;
+    color: #121212;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    #controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    #filterPanel {
+      justify-content: center;
+    }
+    #searchBox {
+      width: 100%;
+      min-width: unset;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Output Log Report</h1>
+
+<div id="controls" role="region" aria-label="Log filters and search">
+  <div id="filterPanel" aria-label="Filter log levels">
+    <label><input type="checkbox" id="filterError" checked /> ERROR</label>
+    <label><input type="checkbox" id="filterWarning" checked /> WARNING</label>
+    <label><input type="checkbox" id="filterInfo" checked /> INFO</label>
+    <label><input type="checkbox" id="filterDebug" /> DEBUG</label>
+  </div>
+  <button id="toggleFiltersBtn" aria-pressed="true">Deselect All</button>
+  <div style="width: 100%; margin-top: 10px;">
+    <input type="search" id="searchBox" placeholder="Search logs..." aria-label="Search logs" style="width: 100%;" />
+  </div>
+</div>
+
+<div id="logContainer" tabindex="0" aria-live="polite" aria-atomic="true" role="log" aria-label="Log lines container">
+  <!-- Logs will be injected here -->
+  <div id="noLogsMessage">No logs to display.</div>
+</div>
+
+<!-- Custom context menu for filtering -->
+<div id="contextMenu" role="menu" aria-hidden="true">
+  <ul>
+    <li id="filterByThisType" role="menuitem" tabindex="-1">Filter by this type</li>
+    <li id="clearFilter" role="menuitem" tabindex="-1">Clear filters</li>
+  </ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+ console.log("DOM fully loaded");
+ 
+  // All your current JS code inside here, for example:
+  
+  let logs = [];  // Will store logs fetched from server
+
+	async function fetchLogs() {
+	  console.log('Fetching logs');
+	  try {
+		const response = await fetch('/output_logs');
+		if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+		const data = await response.json();
+		console.log('Received logs:', data.output_logs.length);
+		logs = data.output_logs || [];
+		renderLogs();
+	  } catch (error) {
+		console.error('Failed to fetch logs:', error);
+	  }
+	}
+
+  const logContainer = document.getElementById('logContainer');
+  const noLogsMessage = document.getElementById('noLogsMessage');
+
+  let activeFilters = ["ERROR", "WARNING", "INFO"];
+  let currentSearch = "";
+
+  function renderLogs() {
+    logContainer.innerHTML = "";
+    let visibleCount = 0;
+
+    logs.forEach(line => {
+      const typeMatch = line.match(/-\s*(ERROR|WARNING|INFO|DEBUG)\s*-/);
+      if(typeMatch && activeFilters.includes(typeMatch[1])) {
+        if(line.toLowerCase().includes(currentSearch.toLowerCase())) {
+          visibleCount++;
+          const div = document.createElement('div');
+          div.className = `log-line ${typeMatch[1]}`;
+          div.textContent = line;
+          div.setAttribute('tabindex', '0');
+          div.addEventListener('contextmenu', showContextMenu);
+          logContainer.appendChild(div);
+        }
+      }
+    });
+
+    console.log(`Rendered ${visibleCount} log lines`);
+    noLogsMessage.style.display = visibleCount === 0 ? "block" : "none";
+  }
+
+  fetchLogs();
+
+  // The rest of your event handlers (checkboxes, toggleBtn, context menu, etc.) also go here
+  
+  // Filter checkboxes
+  const filterCheckboxes = {
+    "ERROR": document.getElementById('filterError'),
+    "WARNING": document.getElementById('filterWarning'),
+    "INFO": document.getElementById('filterInfo'),
+    "DEBUG": document.getElementById('filterDebug')
+  };
+
+  const toggleBtn = document.getElementById('toggleFiltersBtn');
+  toggleBtn.addEventListener('click', () => {
+    const allChecked = Object.values(filterCheckboxes).every(cb => cb.checked);
+    if(allChecked) {
+      Object.values(filterCheckboxes).forEach(cb => cb.checked = false);
+      toggleBtn.textContent = "Select All";
+      toggleBtn.setAttribute("aria-pressed", "false");
+    } else {
+      Object.values(filterCheckboxes).forEach(cb => cb.checked = true);
+      toggleBtn.textContent = "Deselect All";
+      toggleBtn.setAttribute("aria-pressed", "true");
+    }
+    updateFiltersFromUI();
+  });
+
+  function updateFiltersFromUI() {
+    activeFilters = Object.entries(filterCheckboxes)
+      .filter(([_, cb]) => cb.checked)
+      .map(([type]) => type);
+    renderLogs();
+  }
+
+  Object.values(filterCheckboxes).forEach(cb => {
+    cb.addEventListener('change', updateFiltersFromUI);
+  });
+
+
+  
+    const searchBox = document.getElementById('searchBox');
+	searchBox.addEventListener('input', (e) => {
+	  currentSearch = e.target.value;
+	  renderLogs();
+	});
+
+	searchBox.addEventListener('dblclick', (e) => {
+	  e.target.value = '';
+	  currentSearch = '';
+	  renderLogs();
+	});
+
+  const contextMenu = document.getElementById('contextMenu');
+  let currentType = null;
+
+  function showContextMenu(event) {
+    event.preventDefault();
+    const line = event.target.textContent;
+    const match = line.match(/\[(ERROR|WARNING|INFO|DEBUG)\]/);
+    if(match) {
+      currentType = match[1];
+      contextMenu.style.top = event.pageY + "px";
+      contextMenu.style.left = event.pageX + "px";
+      contextMenu.style.display = 'block';
+      contextMenu.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  document.addEventListener('click', () => {
+    contextMenu.style.display = 'none';
+    contextMenu.setAttribute('aria-hidden', 'true');
+  });
+
+  document.getElementById('filterByThisType').addEventListener('click', () => {
+    if(currentType) {
+      Object.entries(filterCheckboxes).forEach(([type, cb]) => {
+        cb.checked = (type === currentType);
+      });
+      updateFiltersFromUI();
+    }
+    contextMenu.style.display = 'none';
+    contextMenu.setAttribute('aria-hidden', 'true');
+  });
+
+  document.getElementById('clearFilter').addEventListener('click', () => {
+    Object.values(filterCheckboxes).forEach(cb => cb.checked = true);
+    updateFiltersFromUI();
+    document.getElementById('searchBox').value = "";
+    currentSearch = "";
+    contextMenu.style.display = 'none';
+    contextMenu.setAttribute('aria-hidden', 'true');
+  });
+
+  contextMenu.addEventListener('keydown', (e) => {
+    if(e.key === "Escape") {
+      contextMenu.style.display = 'none';
+      contextMenu.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+});
+
+</script>
+
+</body>
+</html>
