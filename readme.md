@@ -3,6 +3,7 @@
 <img width="1915" height="1020" alt="webshell menu" src="https://github.com/user-attachments/assets/3da12f3d-0710-46f5-a028-b233f3a4c628" />
 
 
+
 **WebShell Analyzer** is a cross-platform, offline forensic toolkit for SOC analysts, and IR teams. It detects and investigates webshells, suspicious commands, and C2 traffic by parsing web server logs (IIS, Apache, Nginx), correlating findings with MFT data, and scanning web roots with YARA rules — all with automated reporting.
 
 Developed by:
@@ -35,6 +36,9 @@ https://www.linkedin.com/in/ekremozdemir19/
 
 * **False Positive Reduction:**
   Regex boundaries, static resource whitelisting, and easy keyword/category tuning.
+  
+  <img width="1906" height="970" alt="output_log_viewer" src="https://github.com/user-attachments/assets/9dd61e7d-7a70-4538-be1f-21af1e66bfb9" />
+
 
 ---
 
