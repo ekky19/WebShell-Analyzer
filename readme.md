@@ -25,8 +25,14 @@ https://www.linkedin.com/in/ekremozdemir19/
   Flags traffic to known C2 IPs/domains via an updatable local feed.
 * **Keyword Manager GUI:**
   An interface for editing detection keywords, supporting categories and custom server types.
+
+  <img width="1912" height="1022" alt="keyword_manager" src="https://github.com/user-attachments/assets/f88367aa-e343-460f-ae36-b035a72538f6" />
+  
 * **Automated Reporting:**
   Generates HTML reports with color-coded highlights, detailed IOC breakdown, and summary stats.
+
+  <img width="1908" height="901" alt="webshell report1" src="https://github.com/user-attachments/assets/248e95a8-bb97-465a-86e1-d1056b1fbbf6" />
+
 * **False Positive Reduction:**
   Regex boundaries, static resource whitelisting, and easy keyword/category tuning.
 
