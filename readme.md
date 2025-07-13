@@ -1,5 +1,8 @@
 # WebShell Analyzer
 
+<img width="1915" height="1020" alt="webshell menu" src="https://github.com/user-attachments/assets/3da12f3d-0710-46f5-a028-b233f3a4c628" />
+
+
 **WebShell Analyzer** is a cross-platform, offline forensic toolkit for SOC analysts, and IR teams. It detects and investigates webshells, suspicious commands, and C2 traffic by parsing web server logs (IIS, Apache, Nginx), correlating findings with MFT data, and scanning web roots with YARA rules — all with automated reporting.
 
 Developed by:
@@ -13,6 +16,9 @@ https://www.linkedin.com/in/ekremozdemir19/
   Detects webshell activity and suspicious access patterns in IIS, Apache, and Nginx logs.
 * **YARA-Based Webshell Scanning:**
   Standalone YARA scanner for webroot files using customizable rule sets.
+
+  <img width="1887" height="894" alt="yara report1" src="https://github.com/user-attachments/assets/7fb345da-7f03-4858-bbe5-0184ab0f01b7" />
+  
 * **File System Correlation:**
   Matches suspicious activity in logs with MFT file events (CSV format) for deeper investigation.
 * **C2 Threat Intelligence:**
@@ -162,3 +168,5 @@ For commercial use, please contact me for permission: [ekremozdemir99@gmail.com]
 
 
 ---
+
+
